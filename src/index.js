@@ -1,24 +1,42 @@
-import { ColorModeScript } from '@chakra-ui/react';
-import React, { StrictMode } from 'react';
+import React from 'react';
 import ReactDOM from 'react-dom';
-import App from './App';
-import reportWebVitals from './reportWebVitals';
-import * as serviceWorker from './serviceWorker';
+import { Provider } from 'react-redux';
+import { ConnectedRouter } from 'connected-react-router';
+import App from 'containers/app';
+import Error from 'containers/ErrorBoundary/template_';
+import configureStore from 'configureStore';
+import * as serviceWorker from 'serviceWorker';
 
-ReactDOM.render(
-  <StrictMode>
-    <ColorModeScript />
-    <App />
-  </StrictMode>,
-  document.getElementById('root')
-);
+const renderApp = (_, store, history) => {
+  const render = (Component, store, history) => {
+    ReactDOM.render(
+      <Provider store={store}>
+        <ConnectedRouter history={history}>
+          <Component store={store} history={history} />
+        </ConnectedRouter>
+      </Provider>,
+      document.getElementById('root')
+    );
+  };
+  render(App, store, history);
+};
 
-// If you want your app to work offline and load faster, you can change
-// unregister() to register() below. Note this comes with some pitfalls.
-// Learn more about service workers: https://cra.link/PWA
-serviceWorker.unregister();
+const renderError = e => {
+  console.error(e);
+  ReactDOM.render(
+    <Error error="An error has occured" errorInfo={e} />,
+    document.getElementById('app')
+  );
+};
 
-// If you want to start measuring performance in your app, pass a function
-// to log results (for example: reportWebVitals(console.log))
-// or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
-reportWebVitals();
+configureStore()
+  .then(root => {
+    renderApp(App, root.store, root.history);
+  })
+  .catch(e => {
+    renderError(e);
+  });
+
+if (process.env.NODE_ENV === 'production') {
+  serviceWorker.register();
+}
