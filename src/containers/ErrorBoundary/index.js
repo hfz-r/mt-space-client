@@ -9,6 +9,13 @@ class ErrorBoundary extends Component {
     errorInfo: null,
   };
 
+  static getDerivedStateFromError(error, info) {
+    return {
+      error,
+      errorInfo: info,
+    };
+  }
+
   componentDidCatch(error, info) {
     this.setState({
       error,

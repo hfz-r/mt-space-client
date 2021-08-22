@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { curry, filter, find, map, propEq } from 'ramda';
 import { actions } from 'stores';
-import { data } from '../base-data';
+import { data } from 'utils/base-data';
 
 const FeeRebate = React.lazy(() => import('containers/Finance/FeeRebate'));
 const contents = { FeeRebate };

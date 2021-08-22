@@ -1,0 +1,17 @@
+export const RESET = 'RESET';
+export const LOAD_DEMO = 'LOAD_DEMO';
+export const RESET_PROPS = 'RESET_PROPS';
+export const UPDATE_PROPS = 'UPDATE_PROPS';
+export const DELETE_PROPS = 'DELETE_PROPS';
+export const DELETE_COMPONENT = 'DELETE_COMPONENT';
+export const MOVE_COMPONENT = 'MOVE_COMPONENT';
+export const MOVE_SELECTED_COMPONENT_CHILDREN = 'MOVE_SELECTED_COMPONENT_CHILDREN';
+export const ADD_COMPONENT = 'ADD_COMPONENT';
+export const ADD_META_COMPONENT = 'ADD_META_COMPONENT';
+export const SELECT = 'SELECT';
+export const UNSELECT = 'UNSELECT';
+export const SELECT_PARENT = 'SELECT_PARENT';
+export const DUPLICATE = 'DUPLICATE';
+export const SET_COMPONENT_NAME = 'SET_COMPONENT_NAME';
+export const HOVER = 'HOVER';
+export const UNHOVER = 'UNHOVER';

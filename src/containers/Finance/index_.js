@@ -1,6 +1,6 @@
 import React from 'react';
 import { Stack, Heading, Text } from '@chakra-ui/react';
-import useFinanceContext from 'utils/Hooks/BaseData';
+import useFinanceContext from 'hooks/BaseData';
 import Template from './template_';
 
 const Finance = props => {

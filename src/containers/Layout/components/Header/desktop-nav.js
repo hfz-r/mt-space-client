@@ -25,6 +25,9 @@ const colorScheme = type => {
     case 'SunSystem':
       color = 'orange';
       break;
+    case 'Utils':
+      color= 'red';
+      break;
     default:
       color = 'teal';
       break;

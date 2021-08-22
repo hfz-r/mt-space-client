@@ -12,7 +12,7 @@ import { Link as NavLink } from 'react-router-dom';
 
 const Footer = () => {
   return (
-    <Box pt={20} pb={10}>
+    <Box pb={10}>
       <Flex
         align={'center'}
         _before={{

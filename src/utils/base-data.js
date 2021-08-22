@@ -32,4 +32,17 @@ export const data = [
       },
     ],
   },
+  {
+    label: 'Utilities',
+    baseHref: '/utils',
+    children: [
+      {
+        label: 'Query Builder',
+        description: 'Build rules and run SQL query on the fly',
+        tags: ['Utils'],
+        href: '$/qbuilder',
+        filename: ''
+      },
+    ],
+  }
 ];

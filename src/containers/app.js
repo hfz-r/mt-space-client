@@ -8,6 +8,8 @@ import FontFace from 'utils/font-face';
 import theme from './theme_';
 
 const Home = React.lazy(() => import('containers/Home'));
+const QueryBuilder = React.lazy(() => import('containers/QueryBuilder'));
+
 // const About = React.lazy(() => import('containers/About'));
 // const Finance = React.lazy(() => import('containers/Finance'));
 // const FinanceForms = React.lazy(() => import('containers/Finance/Forms'));
@@ -22,6 +24,7 @@ const App = () => (
         <ProgressProvider>
           <Switch>
             <Layout path="/home" component={Home} exact />
+            <Layout path="/utils/qbuilder" component={QueryBuilder} exact />
             {/* <Layout path="/about" component={About} exact /> */}
             {/* <Layout path="/finance" component={Finance} exact /> */}
             {/* <Layout path="/finance/:type" component={FinanceForms} /> */}
