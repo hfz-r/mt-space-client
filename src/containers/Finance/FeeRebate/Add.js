@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useCallback } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { useForm } from 'react-hook-form';
 import {
   Button,
@@ -16,19 +17,17 @@ import {
 import { HiDocumentAdd } from 'react-icons/hi';
 import { IoClose } from 'react-icons/io5';
 // import FocusLock from 'react-focus-lock';
+import { actions, selectors } from 'stores';
 import { FormBody } from './components';
 
 const defaultValues = {
   setupDate: new Date().toISOString().slice(0, 10),
   coas: [
     {
-      coa: 'CR*',
+      coa: 'CR',
       type: 'Rebate',
       currency: 'MYR',
       amc: 'AMC',
-      channel: 'Channel',
-      agent: 'Agent',
-      plan: 'PLAN',
       drcr: 'C',
     },
   ],
@@ -36,6 +35,8 @@ const defaultValues = {
 
 const Add = props => {
   const { isOpen, onOpen, onClose } = useDisclosure();
+  const busyState = useSelector(selectors.investor.selectRebate);
+  const dispatch = useDispatch();
 
   const {
     control,
@@ -58,14 +59,30 @@ const Add = props => {
     defaultValues,
   };
 
-  const onSubmit = values => {
-    return new Promise(resolve => {
-      setTimeout(() => {
-        console.log(values);
-        resolve();
-      }, 1000);
-    });
-  };
+  const handleClose = useCallback(() => {
+    reset(defaultValues);
+    onClose();
+  }, [onClose, reset]);
+
+  const onSubmit = useCallback(
+    ({ coas, investor, setupDate }) => {
+      return new Promise(resolve => {
+        setTimeout(() => {
+          dispatch(actions.investor.addRebate({ coas, investor, setupDate }));
+          handleClose();
+          resolve();
+        }, 2000);
+      });
+    },
+    [dispatch, handleClose]
+  );
+
+  const { busy, error } = busyState.cata({
+    Success: () => ({ error: null, busy: false }),
+    Failure: val => ({ error: val.error, busy: false }),
+    Loading: () => ({ error: null, busy: true }),
+    NotAsked: () => ({ error: null, busy: false }),
+  });
 
   return (
     <>
@@ -84,7 +101,10 @@ const Add = props => {
       >
         <DrawerOverlay />
         <DrawerContent bg={useColorModeValue('white', 'gray.900')}>
-          <DrawerCloseButton />
+          <DrawerCloseButton
+            title="State will be reset to default"
+            onClick={handleClose}
+          />
           <DrawerHeader borderBottomWidth="1px">
             {'New Fee Rebate'}
           </DrawerHeader>
@@ -98,7 +118,11 @@ const Add = props => {
           </DrawerBody>
 
           <DrawerFooter borderTopWidth="1px">
-            <Button variant="outline" mr={3} onClick={() => reset(defaultValues)}>
+            <Button
+              variant="outline"
+              mr={3}
+              onClick={() => reset(defaultValues)}
+            >
               Reset
             </Button>
             <Button

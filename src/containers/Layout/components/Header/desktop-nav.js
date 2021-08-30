@@ -26,7 +26,10 @@ const colorScheme = type => {
       color = 'orange';
       break;
     case 'Utils':
-      color= 'red';
+      color = 'red';
+      break;
+    case 'Maintenance':
+      color = 'pink';
       break;
     default:
       color = 'teal';

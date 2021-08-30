@@ -4,34 +4,41 @@ export const data = [
     baseHref: '/finance',
     children: [
       {
-        label: 'COA Group',
-        description: 'Chart of account',
-        tags: ['Setup'],
-        href: '$/coa-group',
-        filename: ''
+        label: 'CIMB Split',
+        description: 'CIMB split maintenance screen',
+        tags: ['Maintenance'],
+        href: '$/cimb-split',
+        filename: '',
       },
       {
         label: 'Fee Rebate',
         description: 'COA blank fee rebate management',
         tags: ['Setup', 'SunSystem'],
         href: '$/sunsys-coa-setup',
-        filename: 'FeeRebate'
+        filename: 'FeeRebate',
       },
-    ],
-  },
-  {
-    label: 'Investor',
-    baseHref: '/investor',
-    children: [
       {
         label: 'Coming soon',
         description: 'Coming soon',
         tags: ['TBA'],
         href: '$',
-        filename: ''
+        filename: '',
       },
     ],
   },
+  // {
+  //   label: 'Investor',
+  //   baseHref: '/investor',
+  //   children: [
+  //     {
+  //       label: 'Coming soon',
+  //       description: 'Coming soon',
+  //       tags: ['TBA'],
+  //       href: '$',
+  //       filename: ''
+  //     },
+  //   ],
+  // },
   {
     label: 'Utilities',
     baseHref: '/utils',
@@ -41,8 +48,8 @@ export const data = [
         description: 'Build rules and run SQL query on the fly',
         tags: ['Utils'],
         href: '$/qbuilder',
-        filename: ''
+        filename: '',
       },
     ],
-  }
+  },
 ];

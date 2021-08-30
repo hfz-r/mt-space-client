@@ -93,7 +93,7 @@ export const CoaInfo = ({
           />
         </BaseForm>
 
-        <BaseForm id={`amc.${index}`} label={'AMC'}>
+        {/* <BaseForm id={`amc.${index}`} label={'AMC'}>
           <Input
             id={`amc.${index}`}
             {...register(`coas.${index}.amc`)}
@@ -131,7 +131,7 @@ export const CoaInfo = ({
             placeholder="Plan"
             {...baseProps}
           />
-        </BaseForm>
+        </BaseForm> */}
 
         <BaseForm id={`drcr.${index}`} label={'Dr/Cr'}>
           <Input

@@ -5,7 +5,7 @@ import Remote from 'utils/remote';
 import Table from './Table';
 import InnerTable from './InnerTable';
 import { Error, Loading } from './components';
-import { SelectColumnFilter } from './Filters';
+import { SelectColumnFilter } from '../components/Filters';
 
 export const useData = props => {
   const memoizeData = useMemo(() => selectors.investor.makeSelectRebates, []);

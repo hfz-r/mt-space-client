@@ -2,7 +2,7 @@ import { map } from 'ramda';
 import { data } from 'utils/base-data';
 
 export const navConfig = map(d => ({
-  label: d.label,
+  label: d.label === 'Finance' ? 'Forms' : d.label, //todo: proper link and path!
   href: d.baseHref,
   children: map(
     c => ({

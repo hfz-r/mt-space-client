@@ -12,7 +12,7 @@ import {
   useColorModeValue,
 } from '@chakra-ui/react';
 import { Link as NavLink } from 'react-router-dom';
-import { HiExternalLink, HiSave } from 'react-icons/hi';
+import { HiExternalLink } from 'react-icons/hi';
 import PageTransition from 'components/page-transitions';
 import IconButtonAdd from './FeeRebate/Add';
 import { DataSample } from './components';
@@ -24,6 +24,7 @@ const TABS = [
 
 const Template = props => {
   const { colorMode } = useColorMode();
+
   return (
     <Box
       rounded={'md'}
@@ -76,14 +77,6 @@ const Template = props => {
               variant={'ghost'}
               aria-label={'Create new record'}
               title={'Create new record'}
-            />
-            <IconButton
-              cursor={'pointer'}
-              icon={<HiSave />}
-              size={'sm'}
-              variant={'ghost'}
-              aria-label={'Save all changes'}
-              title={'Save all changes'}
             />
             <IconButton
               as={NavLink}

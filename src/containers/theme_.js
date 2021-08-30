@@ -23,6 +23,22 @@ const theme = extendTheme({
       html: {
         scrollBehavior: 'smooth',
       },
+      /* width */
+      '::-webkit-scrollbar': {
+        width: '10px',
+      },
+      /* Track */
+      '::-webkit-scrollbar-track': {
+        background: '#eee',
+      },
+      /* Handle */
+      '::-webkit-scrollbar-thumb': {
+        background: '#999',
+      },
+      /* Handle on hover */
+      '::-webkit-scrollbar-thumb:hover': {
+        background: '#888',
+      },
     },
   },
 });

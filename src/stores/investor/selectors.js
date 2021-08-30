@@ -1,18 +1,22 @@
-import { groupBy, lift, map, pick, pipe, values } from 'ramda';
+import { groupBy, lift, map, pick, pipe, prop, sortBy, values } from 'ramda';
 import { createSelector } from 'reselect';
 import { INITIAL_STATE } from './reducers';
-import Remote from 'utils/remote';
 
 export const selectState = state => state.investor || INITIAL_STATE;
+export const selectRebate = state => state.investor.rebate;
 export const selectRebates = state => state.investor.rebates;
+export const selectTable = state => state.investor.tableStore;
 
 export const makeSelectRebates = createSelector(selectRebates, rebatesR => {
   const makeParent = parent => {
-    return pick(['investor', 'setupType', 'setupBy', 'setupDate'], parent);
+    return pick(['investor', 'setupDate'], parent);
   };
   const R = pipe(
     groupBy(r => r.investor?.investorId),
-    map(r => ({ parent: makeParent(r[0]), child: r })),
+    map(r => ({
+      parent: makeParent(r[0]),
+      child: r,
+    })),
     values
   );
   const transform = ({ rebates }) => {
@@ -21,11 +25,17 @@ export const makeSelectRebates = createSelector(selectRebates, rebatesR => {
   return lift(transform)(rebatesR);
 });
 
-export const makeSelectInvestor = createSelector(
-  makeSelectRebates,
-  rebatesS => {
-    const { rebates } = rebatesS.getOrElse([]);
-    const investor = map(r => r.parent.investor);
-    return Remote.of({ investor: investor(rebates) });
-  }
-);
+//todo: fetch from investor
+export const makeSelectInvestor = createSelector(selectRebates, rebatesR => {
+  const transform = ({ rebates }) => {
+    const iv = pipe(
+      map(i => i.investor),
+      groupBy(i => i.investorId),
+      values,
+      map(i => i[0]),
+      sortBy(prop('investorName'))
+    );
+    return { investor: iv(rebates) };
+  };
+  return lift(transform)(rebatesR);
+});

@@ -9,25 +9,23 @@ import {
   Stack,
   useColorModeValue,
 } from '@chakra-ui/react';
-import { InvestorField } from '../InvestorFields';
+import { InvestorField } from './field-investor';
 
-export const FormGeneral = ({ errors, register, setValue, watch }) => {
-  useEffect(() => {
-    register('investor', { required: true });
-  }, [register]);
+export const FormGeneral = ({ control, errors, register, setValue, watch }) => {
+  // const handleChange = useCallback(
+  //   val => setValue('investor', val),
+  //   [setValue]
+  // );
 
-  const handleChange = useCallback(
-    val => setValue('investor', val),
-    [setValue]
-  );
+  // useEffect(() => {
+  //   register('investor', { required: 'This is required' });
+  // }, [register]);
 
   return (
     <>
-      <InvestorField onChange={handleChange} />
-      {/* other fields */}
       <Stack
         px={4}
-        py={5}
+        pb={5}
         bg={useColorModeValue('gray.50', 'gray.800')}
         spacing={6}
       >
@@ -35,54 +33,34 @@ export const FormGeneral = ({ errors, register, setValue, watch }) => {
           <FormControl
             as={GridItem}
             colSpan={[6, 3]}
-            isInvalid={errors.setupType}
+            isInvalid={errors.investor}
           >
             <FormLabel
               fontSize="sm"
               fontWeight="md"
-              htmlFor="setupType"
+              htmlFor="investor"
               color={useColorModeValue('gray.700', 'gray.50')}
             >
-              {'Setup type'}
+              {'Investor'}
             </FormLabel>
-            <Input
-              id="setupType"
-              placeholder="Setup type"
+            <InvestorField
+              id="investor"
+              placeholder="Investor name"
               variant="filled"
               shadow="sm"
               w="full"
               rounded="md"
-              {...register('setupType')}
+              {...{ control }}
+              //onChange={handleChange}
             />
+            <FormErrorMessage>
+              {errors.investor && errors.investor.message}
+            </FormErrorMessage>
           </FormControl>
 
           <FormControl
             as={GridItem}
             colSpan={[6, 3]}
-            isInvalid={errors.setupBy}
-          >
-            <FormLabel
-              fontSize="sm"
-              fontWeight="md"
-              htmlFor="setupBy"
-              color={useColorModeValue('gray.700', 'gray.50')}
-            >
-              {'Setup by'}
-            </FormLabel>
-            <Input
-              id="setupBy"
-              placeholder="Setup by"
-              variant="filled"
-              shadow="sm"
-              w="full"
-              rounded="md"
-              {...register('setupBy')}
-            />
-          </FormControl>
-
-          <FormControl
-            as={GridItem}
-            colSpan={[6, 4]}
             isInvalid={errors.setupDate}
           >
             <FormLabel

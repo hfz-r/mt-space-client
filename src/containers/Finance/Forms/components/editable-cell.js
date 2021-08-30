@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Input, useColorMode } from '@chakra-ui/react';
+import CurrencyDropdown from './currency-dropdown';
 
 export default function EditableCell({
   value: initialValue,
@@ -15,11 +16,10 @@ export default function EditableCell({
     setValue(initialValue);
   }, [initialValue]);
 
-  return !editable ? (
-    initialValue
-  ) : (
+  return id !== 'currency' ? (
     <Input
       size="xs"
+      disabled={!editable}
       type={'text'}
       value={value}
       color={colorMode === 'light' ? 'gray.800' : 'gray.200'}
@@ -30,6 +30,20 @@ export default function EditableCell({
         outline: 'none',
       }}
       onChange={e => setValue(e.target.value)}
+      onBlur={() => updateData(index, id, value)}
+    />
+  ) : (
+    <CurrencyDropdown
+      size="xs"
+      disabled={!editable}
+      variant="filled"
+      color={colorMode === 'light' ? 'gray.800' : 'gray.200'}
+      bg={colorMode === 'light' ? 'gray.100' : 'gray.600'}
+      value={value}
+      onChange={e => {
+        setValue(e.target.value);
+        updateData(index, id, e.target.value);
+      }}
       onBlur={() => updateData(index, id, value)}
     />
   );

@@ -30,7 +30,7 @@ export default () => {
 
   const request = ({
     cancelToken,
-    contentType = 'application/x-www-form-urlencoded',
+    contentType ,
     data,
     endPoint,
     headers,
@@ -45,7 +45,7 @@ export default () => {
         url: `${url}${endPoint}`,
         method,
         data: encodeData(data, contentType, removeDefaultPostData),
-        headers: mergeRight(getHeaders(contentType, sessionToken), headers),
+        headers: headers && mergeRight(getHeaders(contentType, sessionToken), headers),
         cancelToken,
         ...options,
       })

@@ -1,15 +1,26 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
+import { useDispatch } from 'react-redux';
 import {
   useFlexLayout,
   useResizeColumns,
   useSortBy,
   useTable,
 } from 'react-table';
+import * as R from 'ramda';
 import {
   Box,
   Center,
+  Checkbox,
   Flex,
+  IconButton,
   Spinner,
+  Spacer,
   Text,
   Tr,
   Td,
@@ -17,19 +28,44 @@ import {
   useColorMode,
   useColorModeValue,
 } from '@chakra-ui/react';
-import { GoTriangleDown, GoTriangleUp } from 'react-icons/go';
+import { GoX, GoTriangleDown, GoTriangleUp } from 'react-icons/go';
+import { actions } from 'stores';
 import { ActionButton, EditableCell } from './components';
-import CurrencyDropdown from 'components/currency-dropdown';
 
 const SubRow = ({
   parentData,
   childData,
   addData,
   updateData,
+  removeData,
   resetData,
   skipReset,
 }) => {
+  const [isEditable, setEditable] = useState(false);
   const { colorMode } = useColorMode();
+  const dispatch = useDispatch();
+
+  const handleSyncSave = useCallback(() => {
+    if (isEditable) {
+      const { child } = parentData.original;
+      const fi = R.curry((prop, value) => {
+        return R.findIndex(R.propEq(prop, value));
+      });
+      const withIdx = src =>
+        R.map(c => ({
+          index: fi('coa', c.coa)(src),
+          ...c,
+        }))(src);
+      const merge = R.difference(withIdx(childData), withIdx(child));
+      const payload = merge.length > 0 && {
+        investorId: R.path([0, 'investor', 'investorId'], merge),
+        rebates: merge,
+      };
+      console.log(child);
+      console.log(childData);
+      dispatch(actions.investor.persistTable(payload));
+    }
+  }, [childData, dispatch, isEditable, parentData.original]);
 
   const defaultColumn = useMemo(
     () => ({
@@ -44,6 +80,26 @@ const SubRow = ({
   const columns = useMemo(
     () => [
       {
+        id: 'selection',
+        disableResizing: true,
+        minWidth: 40,
+        maxWidth: 35,
+        width: 40,
+        Cell: ({ row }) => (
+          <IconButton
+            disabled={!isEditable}
+            color="red.400"
+            bg="transparent"
+            size="xs"
+            rounded="full"
+            label="Delete record"
+            _focus={{ boxShadow: 'none' }}
+            onClick={e => removeData(row.index)}
+            icon={<GoX />}
+          />
+        ),
+      },
+      {
         Header: 'COA',
         accessor: 'coa',
       },
@@ -54,43 +110,17 @@ const SubRow = ({
       {
         Header: 'Currency',
         accessor: 'currency',
-        Cell: ({ value }) => (
-          <CurrencyDropdown
-            size="xs"
-            variant="filled"
-            color={useColorModeValue('gray.800', 'gray.200')}
-            bg={useColorModeValue('gray.100', 'gray.600')}
-            initialValue={value}
-          />
-        ),
       },
       {
         Header: 'AMC',
         accessor: 'amc',
       },
       {
-        Header: 'Channel',
-        accessor: 'channel',
-      },
-      {
-        Header: 'Agent',
-        accessor: 'agent',
-      },
-      {
-        Header: 'Plan',
-        accessor: 'plan',
-        // Cell: ({ value }) => (
-        //   <Badge variant="outline" colorScheme="green">
-        //     {value}
-        //   </Badge>
-        // ),
-      },
-      {
         Header: 'DrCr',
         accessor: 'drcr',
       },
     ],
-    []
+    [removeData, isEditable]
   );
 
   const { getTableProps, headerGroups, rows, prepareRow } = useTable(
@@ -120,8 +150,22 @@ const SubRow = ({
         borderColor={useColorModeValue('gray.100', 'gray.900')}
         bg={useColorModeValue('gray.50', 'gray.700')}
       >
-        <Flex pb={1} justifyContent="flex-end">
-          <ActionButton addData={addData} resetData={resetData} />
+        <Flex pb={1}>
+          <Checkbox
+            isChecked={isEditable}
+            size="sm"
+            colorScheme="blue"
+            onChange={e => setEditable(e.target.checked)}
+          >
+            Editable
+          </Checkbox>
+          <Spacer />
+          <ActionButton
+            addData={addData}
+            resetData={resetData}
+            handleSyncSave={handleSyncSave}
+            isEditable={!isEditable}
+          />
         </Flex>
         <Box
           display="block"
@@ -244,14 +288,19 @@ const SubRow = ({
                                 justifyContent:
                                   cell.column.align === 'right'
                                     ? 'flex-end'
+                                    : cell.column.id === 'selection'
+                                    ? 'center'
                                     : 'flex-start',
-                                alignItems: 'flex-start',
+                                alignItems:
+                                  cell.column.id === 'selection'
+                                    ? 'center'
+                                    : 'flex-start',
                                 display: 'flex',
                               },
                             },
                           ])}
                         >
-                          {cell.render('Cell', { editable: true })}
+                          {cell.render('Cell', { editable: isEditable })}
                         </Text>
                       );
                     })}
@@ -259,7 +308,7 @@ const SubRow = ({
                 );
               })
             ) : (
-              <Text as="div" p="4px 24px" fontSize="md">
+              <Text as="div" p="4px 24px">
                 {'No records'}
               </Text>
             )}
@@ -275,24 +324,48 @@ const InnerTable = ({ parentVisibleColumns, data }) => {
   const [childData, setChildData] = useState([]);
   const [originalChildData] = useState(data.original.child);
   const skipResetRef = useRef(false);
+  const dispatch = useDispatch();
 
   const addData = () => {
     skipResetRef.current = true;
-    setChildData([
-      ...childData,
-      {
-        agent: '',
-        amc: '',
-        coa: '',
-        channel: '',
-        drcr: '',
-        plan: '',
-        type: '',
-      },
-    ]);
+    const newData = {
+      investor: childData[0].investor,
+      amc: 'AFC',
+      coa: '',
+      currency: 'MYR',
+      drcr: '',
+      type: 'Rebate',
+    };
+    setChildData([newData, ...childData]);
   };
 
-  const updateData = (rowIndex, columnId, value) => {
+  const resetData = () => {
+    skipResetRef.current = true;
+    setChildData(originalChildData);
+    dispatch(
+      actions.investor.refreshTable({
+        parentId: data.values['parent.investor.investorId'],
+      })
+    );
+  };
+
+  const removeData = useCallback(
+    rowIndex => {
+      skipResetRef.current = true;
+      setChildData(old => {
+        return R.remove(rowIndex, 1, old);
+      });
+      dispatch(
+        actions.investor.removeTable({
+          parentId: data.values['parent.investor.investorId'],
+          rowIndex,
+        })
+      );
+    },
+    [data.values, dispatch]
+  );
+
+  const updateData = useCallback((rowIndex, columnId, value) => {
     skipResetRef.current = true;
     setChildData(old =>
       old.map((row, index) => {
@@ -305,12 +378,7 @@ const InnerTable = ({ parentVisibleColumns, data }) => {
         return row;
       })
     );
-  };
-
-  const resetData = () => {
-    skipResetRef.current = true;
-    setChildData(originalChildData);
-  };
+  }, []);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -321,7 +389,7 @@ const InnerTable = ({ parentVisibleColumns, data }) => {
     return () => {
       clearTimeout(timer);
     };
-  }, [data]);
+  }, [data, dispatch]);
 
   useEffect(() => {
     skipResetRef.current = false;
@@ -354,6 +422,7 @@ const InnerTable = ({ parentVisibleColumns, data }) => {
             childData={childData}
             addData={addData}
             updateData={updateData}
+            removeData={removeData}
             resetData={resetData}
             skipReset={skipResetRef.current}
           />

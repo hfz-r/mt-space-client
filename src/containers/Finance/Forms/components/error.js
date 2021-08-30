@@ -7,7 +7,7 @@ export default function Error({ message }) {
   const history = useHistory();
 
   return (
-    <Container mt="10">
+    <Container my="10">
       <Center>
         <VStack>
           <Heading color={'red'}>Internal error</Heading>

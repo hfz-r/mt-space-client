@@ -51,6 +51,11 @@ export const FormCoa = ({
     name: 'coas',
   });
 
+  const handleChange = useCallback(
+    (e, name) => setValue(name, e.target.value),
+    [setValue]
+  );
+
   const watchFields = watch('coas');
   const controlledFields = fields.map((field, index) => {
     return {
@@ -63,7 +68,7 @@ export const FormCoa = ({
 
   return (
     <>
-      <Box px={4} textAlign="right">
+      <Box px={4} mt={3} textAlign="right">
         <chakra.button
           type="button"
           bg="gray.900"
@@ -84,7 +89,7 @@ export const FormCoa = ({
       </Box>
       <Stack
         px={4}
-        py={5}
+        py={3}
         spacing={6}
         bg={useColorModeValue('gray.50', 'gray.800')}
       >
@@ -95,7 +100,7 @@ export const FormCoa = ({
                 maxW="xs"
                 mx="auto"
                 bg={colorMode === 'light' ? 'white' : 'gray.900'}
-                shadow="lg"
+                //shadow="lg"
                 rounded="lg"
               >
                 <Flex
@@ -124,7 +129,7 @@ export const FormCoa = ({
                   />
                 </Flex>
                 <Box px={4} pb={4}>
-                  <Editable
+                  {/* <Editable
                     fontWeight="bold"
                     fontSize="2xl"
                     textTransform="uppercase"
@@ -138,9 +143,23 @@ export const FormCoa = ({
                       aria-label="Editable field"
                     />
                     <EditableInput pl={1} />
-                  </Editable>
+                  </Editable> */}
 
                   <Input
+                    my={3}
+                    size={'sm'}
+                    variant="filled"
+                    shadow="sm"
+                    rounded="md"
+                    placeholder="COA"
+                    value={field.coa ? getValues(`coas.${index}.coa`) : ''}
+                    onChange={e => handleChange(e, `coas.${index}.coa`)}
+                    // onChange={e =>
+                    //   setValue(`coas.${index}.coa`, e.target.value)
+                    // }
+                  />
+
+                  {/* <Input
                     my={3}
                     size={'sm'}
                     variant={'filled'}
@@ -149,17 +168,20 @@ export const FormCoa = ({
                     onChange={e =>
                       setValue(`coas.${index}.type`, e.target.value)
                     }
-                  />
+                  /> */}
 
                   <CurrencyDropdown
                     size="sm"
                     variant="filled"
+                    shadow="sm"
+                    rounded="md"
                     value={
                       field.currency ? getValues(`coas.${index}.currency`) : ''
                     }
-                    onChange={e => {
-                      setValue(`coas.${index}.currency`, e.target.value);
-                    }}
+                    onChange={e => handleChange(e, `coas.${index}.currency`)}
+                    // onChange={e => {
+                    //   setValue(`coas.${index}.currency`, e.target.value);
+                    // }}
                   />
                 </Box>
               </Box>

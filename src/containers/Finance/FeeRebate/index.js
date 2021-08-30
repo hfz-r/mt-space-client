@@ -4,15 +4,14 @@ import { selectors } from 'stores';
 import Table from '../Forms/Table';
 import InnerTable from '../Forms/InnerTable';
 import { Error, Loading } from '../Forms/components';
-import { SelectColumnFilter } from '../Forms/Filters';
 
-export const useData = props => {
+export const useRebateContext = props => {
   const memoizeData = useMemo(() => selectors.investor.makeSelectRebates, []);
   return useSelector(state => memoizeData(state));
 };
 
 const FeeRebate = props => {
-  const memoizeData = useData(props);
+  const memoizeData = useRebateContext(props);
   const memoizeColumns = useMemo(
     () => [
       {
@@ -36,7 +35,7 @@ const FeeRebate = props => {
         aggregate: 'count',
         Aggregated: ({ value }) => `${value} investor ids`,
         style: {
-          width: '180px',
+          minWidth: '200px',
           whiteSpace: 'nowrap',
         },
       },
@@ -47,23 +46,10 @@ const FeeRebate = props => {
         Aggregated: ({ value }) => `${value} investor names`,
         filter: 'fuzzyText',
         style: {
-          width: '550px',
-          maxWidth: '550px',
+          width: '700px',
+          maxWidth: '700px',
           overflow: 'hidden',
           textOverflow: 'ellipsis',
-          whiteSpace: 'nowrap',
-        },
-      },
-      {
-        Header: 'Setup Type',
-        accessor: 'parent.setupType',
-        aggregate: 'count',
-        Aggregated: ({ value }) => `${value} types`,
-        filter: 'includes',
-        Filter: SelectColumnFilter,
-        style: {
-          width: '180px',
-          textAlign: 'center',
           whiteSpace: 'nowrap',
         },
       },
@@ -74,21 +60,8 @@ const FeeRebate = props => {
         Aggregated: ({ value }) => `${value} setup date`,
         Cell: ({ value }) => new Date(value).toLocaleDateString('en-GB'),
         style: {
-          width: '180px',
-          textAlign: 'center',
-          whiteSpace: 'nowrap',
-        },
-      },
-      {
-        Header: 'Setup By',
-        accessor: 'parent.setupBy',
-        aggregate: 'count',
-        Aggregated: ({ value }) => `${value} setup-by`,
-        style: {
-          width: '150px',
-          maxWidth: '150px',
-          overflow: 'hidden',
-          textOverflow: 'ellipsis',
+          minWidth: '200px',
+          //textAlign: 'center',
           whiteSpace: 'nowrap',
         },
       },

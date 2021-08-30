@@ -5,6 +5,7 @@ import {
   AccordionButton,
   AccordionPanel,
   AccordionIcon,
+  Divider,
   Flex,
   Icon,
   Spacer,
@@ -76,14 +77,16 @@ export const FormBody = props => {
               <Icon as={IoAnalyticsSharp} color={'yellow.500'} w={5} h={5} />
             }
             iconBg={useColorModeValue('yellow.100', 'yellow.900')}
-            text={'General'}
+            text={'Form'}
           />
         }
       >
         <FormGeneral {...props} />
+        <Divider />
+        <FormCoa {...props} />
       </AccordionContainer>
 
-      <AccordionContainer
+      {/* <AccordionContainer
         buttonTitle={
           <ButtonTitle
             icon={<Icon as={IoCashSharp} color={'green.500'} w={5} h={5} />}
@@ -93,7 +96,7 @@ export const FormBody = props => {
         }
       >
         <FormCoa {...props} />
-      </AccordionContainer>
+      </AccordionContainer> */}
     </Stack>
   );
 };

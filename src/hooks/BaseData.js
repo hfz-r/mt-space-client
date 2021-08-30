@@ -5,7 +5,8 @@ import { actions } from 'stores';
 import { data } from 'utils/base-data';
 
 const FeeRebate = React.lazy(() => import('containers/Finance/FeeRebate'));
-const contents = { FeeRebate };
+const CimbSplit = React.lazy(() => import('containers/Finance/Cimb'));
+const contents = { CimbSplit, FeeRebate };
 
 const useBaseData = (path, label) => {
   const [config, setConfig] = useState({});
@@ -43,7 +44,7 @@ const useBaseData = (path, label) => {
       case 'sunsys-coa-setup':
         dispatch(actions.investor.fetchRebates({ size: 1000 }));
         break;
-      case 'coa-group':
+      case 'cimb-split':
         break;
       default:
         break;

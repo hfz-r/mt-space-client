@@ -1,15 +1,16 @@
+import { Flex, IconButton, Tooltip } from '@chakra-ui/react';
 import {
-  Flex,
-  IconButton,
-  Tooltip,
-} from '@chakra-ui/react';
-import { IoAddCircleSharp ,IoRefreshCircleSharp} from "react-icons/io5";
+  IoAddCircleSharp,
+  IoRefreshCircleSharp,
+  IoSyncCircleSharp,
+} from 'react-icons/io5';
 
 const Button = props => {
   return (
     <Tooltip hasArrow placement="top" label={props.label}>
       <IconButton
-        fontSize="2xl"
+        fontSize="xl"
+        disabled={props.isEditable}
         color={props.color}
         icon={props.icon}
         aria-label={props.label}
@@ -26,12 +27,21 @@ export default function CodeActions(props) {
   return (
     <Flex alignItems="center">
       <Button
+        {...props}
+        color="blue.400"
+        icon={<IoSyncCircleSharp />}
+        onClick={props.handleSyncSave}
+        label="Save & Sync"
+      />
+      <Button
+        {...props}
         color="blue.400"
         icon={<IoAddCircleSharp />}
         onClick={props.addData}
         label="Create new record"
       />
       <Button
+        {...props}
         color="blue.400"
         icon={<IoRefreshCircleSharp />}
         onClick={props.resetData}

@@ -22,7 +22,7 @@ import {
   useSortBy,
 } from 'react-table';
 import { GoTriangleDown, GoTriangleUp } from 'react-icons/go';
-import { fuzzyTextFilterFn, DefaultColumnFilter } from './Filters';
+import { fuzzyTextFilterFn, DefaultColumnFilter } from '../components/Filters';
 import Pagination from './Pagination';
 
 const DataTable = ({ columns, data, renderSubComponent }) => {
