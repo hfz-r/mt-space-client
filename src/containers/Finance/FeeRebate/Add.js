@@ -1,5 +1,5 @@
 import React, { useCallback } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import { useForm } from 'react-hook-form';
 import {
   Button,
@@ -17,7 +17,8 @@ import {
 import { HiDocumentAdd } from 'react-icons/hi';
 import { IoClose } from 'react-icons/io5';
 // import FocusLock from 'react-focus-lock';
-import { actions, selectors } from 'stores';
+import { actions } from 'stores';
+import useDataContext from 'hooks/ChildData';
 import { FormBody } from './components';
 
 const defaultValues = {
@@ -35,7 +36,7 @@ const defaultValues = {
 
 const Add = props => {
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const busyState = useSelector(selectors.investor.selectRebate);
+  const { busy, error } = useDataContext();
   const dispatch = useDispatch();
 
   const {
@@ -76,13 +77,6 @@ const Add = props => {
     },
     [dispatch, handleClose]
   );
-
-  const { busy, error } = busyState.cata({
-    Success: () => ({ error: null, busy: false }),
-    Failure: val => ({ error: val.error, busy: false }),
-    Loading: () => ({ error: null, busy: true }),
-    NotAsked: () => ({ error: null, busy: false }),
-  });
 
   return (
     <>

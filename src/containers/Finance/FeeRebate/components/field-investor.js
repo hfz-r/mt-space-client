@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React from 'react';
 import { useSelector } from 'react-redux';
 import { useController } from 'react-hook-form';
 import {
@@ -17,8 +17,7 @@ import { IoClose, IoSearch } from 'react-icons/io5';
 import { selectors } from 'stores';
 
 const useInvestorContext = () => {
-  const memoizeData = useMemo(() => selectors.investor.makeSelectInvestor, []);
-  const investor = useSelector(state => memoizeData(state));
+  const investor = useSelector(selectors.investor.makeSelectInvestor);
   return investor.getOrElse([]);
 };
 

@@ -5,13 +5,8 @@ import Table from '../Forms/Table';
 import InnerTable from '../Forms/InnerTable';
 import { Error, Loading } from '../Forms/components';
 
-export const useRebateContext = props => {
-  const memoizeData = useMemo(() => selectors.investor.makeSelectRebates, []);
-  return useSelector(state => memoizeData(state));
-};
-
 const FeeRebate = props => {
-  const memoizeData = useRebateContext(props);
+  const memoizeData = useSelector(selectors.investor.makeSelectRebates);
   const memoizeColumns = useMemo(
     () => [
       {

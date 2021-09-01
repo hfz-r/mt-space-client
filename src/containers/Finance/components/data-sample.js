@@ -1,4 +1,4 @@
-import { memo, useMemo } from 'react';
+import { memo } from 'react';
 import { useSelector } from 'react-redux';
 import { slice } from 'ramda';
 import { Box, Button, useClipboard } from '@chakra-ui/react';
@@ -6,13 +6,8 @@ import { selectors } from 'stores';
 import Highlight from 'components/highlight';
 import { Error, Loading } from '../Forms/components';
 
-const useData = () => {
-  const memoizeData = useMemo(() => selectors.investor.selectRebates, []);
-  return useSelector(state => memoizeData(state));
-};
-
 const DataSample = () => {
-  const memoizeData = useData();
+  const memoizeData = useSelector(selectors.investor.selectRebates);
   const { hasCopied, onCopy } = useClipboard(
     JSON.stringify(memoizeData.getOrElse({}), null, 3)
   );

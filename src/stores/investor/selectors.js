@@ -5,7 +5,6 @@ import { INITIAL_STATE } from './reducers';
 export const selectState = state => state.investor || INITIAL_STATE;
 export const selectRebate = state => state.investor.rebate;
 export const selectRebates = state => state.investor.rebates;
-export const selectTable = state => state.investor.tableStore;
 
 export const makeSelectRebates = createSelector(selectRebates, rebatesR => {
   const makeParent = parent => {

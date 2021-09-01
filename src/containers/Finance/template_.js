@@ -24,7 +24,6 @@ const TABS = [
 
 const Template = props => {
   const { colorMode } = useColorMode();
-
   return (
     <Box
       rounded={'md'}

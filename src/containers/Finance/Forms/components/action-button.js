@@ -1,16 +1,12 @@
 import { Flex, IconButton, Tooltip } from '@chakra-ui/react';
-import {
-  IoAddCircleSharp,
-  IoRefreshCircleSharp,
-  IoSyncCircleSharp,
-} from 'react-icons/io5';
+import { IoBag, IoBagAdd, IoSave } from 'react-icons/io5';
+import useDataContext from 'hooks/ChildData';
 
 const Button = props => {
   return (
     <Tooltip hasArrow placement="top" label={props.label}>
       <IconButton
-        fontSize="xl"
-        disabled={props.isEditable}
+        isLoading={props.busy}
         color={props.color}
         icon={props.icon}
         aria-label={props.label}
@@ -24,26 +20,28 @@ const Button = props => {
 };
 
 export default function CodeActions(props) {
+  const { busy } = useDataContext();
   return (
     <Flex alignItems="center">
       <Button
         {...props}
-        color="blue.400"
-        icon={<IoSyncCircleSharp />}
-        onClick={props.handleSyncSave}
-        label="Save & Sync"
+        color="green.400"
+        busy={busy}
+        icon={<IoSave />}
+        onClick={props.syncData}
+        label={'Save & Sync'}
       />
       <Button
         {...props}
-        color="blue.400"
-        icon={<IoAddCircleSharp />}
+        color="blue.500"
+        icon={<IoBagAdd />}
         onClick={props.addData}
         label="Create new record"
       />
       <Button
         {...props}
-        color="blue.400"
-        icon={<IoRefreshCircleSharp />}
+        color="red.400"
+        icon={<IoBag />}
         onClick={props.resetData}
         label="Refresh record"
       />

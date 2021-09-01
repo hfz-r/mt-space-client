@@ -12,15 +12,13 @@ import {
   useSortBy,
   useTable,
 } from 'react-table';
-import * as R from 'ramda';
+import { assoc, difference, differenceWith, map, remove } from 'ramda';
 import {
   Box,
   Center,
-  Checkbox,
   Flex,
   IconButton,
   Spinner,
-  Spacer,
   Text,
   Tr,
   Td,
@@ -33,39 +31,16 @@ import { actions } from 'stores';
 import { ActionButton, EditableCell } from './components';
 
 const SubRow = ({
-  parentData,
+  originalData,
   childData,
   addData,
   updateData,
   removeData,
   resetData,
+  syncChildData,
   skipReset,
 }) => {
-  const [isEditable, setEditable] = useState(false);
   const { colorMode } = useColorMode();
-  const dispatch = useDispatch();
-
-  const handleSyncSave = useCallback(() => {
-    if (isEditable) {
-      const { child } = parentData.original;
-      const fi = R.curry((prop, value) => {
-        return R.findIndex(R.propEq(prop, value));
-      });
-      const withIdx = src =>
-        R.map(c => ({
-          index: fi('coa', c.coa)(src),
-          ...c,
-        }))(src);
-      const merge = R.difference(withIdx(childData), withIdx(child));
-      const payload = merge.length > 0 && {
-        investorId: R.path([0, 'investor', 'investorId'], merge),
-        rebates: merge,
-      };
-      console.log(child);
-      console.log(childData);
-      dispatch(actions.investor.persistTable(payload));
-    }
-  }, [childData, dispatch, isEditable, parentData.original]);
 
   const defaultColumn = useMemo(
     () => ({
@@ -79,26 +54,6 @@ const SubRow = ({
 
   const columns = useMemo(
     () => [
-      {
-        id: 'selection',
-        disableResizing: true,
-        minWidth: 40,
-        maxWidth: 35,
-        width: 40,
-        Cell: ({ row }) => (
-          <IconButton
-            disabled={!isEditable}
-            color="red.400"
-            bg="transparent"
-            size="xs"
-            rounded="full"
-            label="Delete record"
-            _focus={{ boxShadow: 'none' }}
-            onClick={e => removeData(row.index)}
-            icon={<GoX />}
-          />
-        ),
-      },
       {
         Header: 'COA',
         accessor: 'coa',
@@ -120,7 +75,7 @@ const SubRow = ({
         accessor: 'drcr',
       },
     ],
-    [removeData, isEditable]
+    []
   );
 
   const { getTableProps, headerGroups, rows, prepareRow } = useTable(
@@ -134,7 +89,33 @@ const SubRow = ({
     },
     useSortBy,
     useResizeColumns,
-    useFlexLayout
+    useFlexLayout,
+    hooks => {
+      hooks.visibleColumns.push(columns => {
+        return [
+          {
+            id: 'selection',
+            disableResizing: true,
+            minWidth: 40,
+            maxWidth: 35,
+            width: 40,
+            Cell: ({ row }) => (
+              <IconButton
+                color="red.400"
+                bg="transparent"
+                size="xs"
+                rounded="full"
+                label="Delete record"
+                _focus={{ boxShadow: 'none' }}
+                onClick={e => removeData(row.index)}
+                icon={<GoX />}
+              />
+            ),
+          },
+          ...columns,
+        ];
+      });
+    }
   );
 
   return (
@@ -150,21 +131,11 @@ const SubRow = ({
         borderColor={useColorModeValue('gray.100', 'gray.900')}
         bg={useColorModeValue('gray.50', 'gray.700')}
       >
-        <Flex pb={1}>
-          <Checkbox
-            isChecked={isEditable}
-            size="sm"
-            colorScheme="blue"
-            onChange={e => setEditable(e.target.checked)}
-          >
-            Editable
-          </Checkbox>
-          <Spacer />
+        <Flex pb={1} justify={'flex-end'}>
           <ActionButton
             addData={addData}
             resetData={resetData}
-            handleSyncSave={handleSyncSave}
-            isEditable={!isEditable}
+            syncData={syncChildData}
           />
         </Flex>
         <Box
@@ -300,7 +271,7 @@ const SubRow = ({
                             },
                           ])}
                         >
-                          {cell.render('Cell', { editable: isEditable })}
+                          {cell.render('Cell', { editable: true })}
                         </Text>
                       );
                     })}
@@ -322,48 +293,48 @@ const SubRow = ({
 const InnerTable = ({ parentVisibleColumns, data }) => {
   const [loading, setLoading] = useState(true);
   const [childData, setChildData] = useState([]);
-  const [originalChildData] = useState(data.original.child);
-  const skipResetRef = useRef(false);
+  const [originalData] = useState(data.original.child);
   const dispatch = useDispatch();
+  const skipResetRef = useRef(false);
 
-  const addData = () => {
+  const syncChildData = useCallback(() => {
+    skipResetRef.current = true;
+    const diffd = map(
+      c => ({
+        ...c,
+        ...assoc('type', 'deleted', c),
+      }),
+      differenceWith((o, c) => o.id === c.id, originalData, childData)
+    );
+    const diff = difference(childData, originalData);
+    const merge = [...diff, ...diffd];
+    merge.length > 0 && dispatch(actions.investor.persistTable(merge));
+  }, [dispatch, childData, originalData]);
+
+  const addData = useCallback(() => {
     skipResetRef.current = true;
     const newData = {
       investor: childData[0].investor,
+      id: 0,
       amc: 'AFC',
       coa: '',
       currency: 'MYR',
       drcr: '',
       type: 'Rebate',
+      setupDate: new Date(),
     };
     setChildData([newData, ...childData]);
-  };
+  }, [childData]);
 
-  const resetData = () => {
+  const resetData = useCallback(() => {
     skipResetRef.current = true;
-    setChildData(originalChildData);
-    dispatch(
-      actions.investor.refreshTable({
-        parentId: data.values['parent.investor.investorId'],
-      })
-    );
-  };
+    setChildData(originalData);
+  }, [originalData]);
 
-  const removeData = useCallback(
-    rowIndex => {
-      skipResetRef.current = true;
-      setChildData(old => {
-        return R.remove(rowIndex, 1, old);
-      });
-      dispatch(
-        actions.investor.removeTable({
-          parentId: data.values['parent.investor.investorId'],
-          rowIndex,
-        })
-      );
-    },
-    [data.values, dispatch]
-  );
+  const removeData = useCallback(rowIndex => {
+    skipResetRef.current = true;
+    setChildData(old => remove(rowIndex, 1, old));
+  }, []);
 
   const updateData = useCallback((rowIndex, columnId, value) => {
     skipResetRef.current = true;
@@ -418,12 +389,13 @@ const InnerTable = ({ parentVisibleColumns, data }) => {
       <Tr>
         <Td colSpan={parentVisibleColumns.length}>
           <SubRow
-            parentData={data}
+            originalData={originalData}
             childData={childData}
             addData={addData}
             updateData={updateData}
             removeData={removeData}
             resetData={resetData}
+            syncChildData={syncChildData}
             skipReset={skipResetRef.current}
           />
         </Td>

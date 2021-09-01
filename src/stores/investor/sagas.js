@@ -1,6 +1,6 @@
 /* eslint-disable import/no-anonymous-default-export */
 import axios from 'axios';
-import { assoc, map, prop } from 'ramda';
+import { assoc, map, path, prop } from 'ramda';
 import { call, put, select } from 'redux-saga/effects';
 import * as A from './actions';
 import * as S from './selectors';
@@ -19,10 +19,9 @@ export default ({ api }) => {
   };
 
   const addRebate = function* ({ payload }) {
-    const { coas, investor: name, setupDate } = payload;
     try {
-      yield put(A.addRebateLoading());
-
+      //yield put(A.addRebateLoading());
+      const { coas, investor: name, setupDate } = payload;
       const { investor } = (yield select(S.makeSelectInvestor)).getOrElse([]);
       const i = investor.find(i => i.investorName === name);
       const res = {
@@ -33,10 +32,9 @@ export default ({ api }) => {
           ...c,
         }))(coas),
       };
-
-      yield call(api.addRebate, res);
+      yield call(api.addRebate, [res]); //payload=array -> used grpc client steaming
       yield call(fetchRebates, { payload: { size: 1000 } });
-      yield put(A.addRebateSuccess(res));
+      //yield put(A.addRebateSuccess(res));
     } catch (e) {
       yield put(A.addRebateFailure(e));
     }
@@ -45,9 +43,17 @@ export default ({ api }) => {
   const persistTable = function* ({ payload }) {
     try {
       yield put(A.addRebateLoading());
-      //yield call(api.addRebate, payload);
-      console.log(payload);
-      yield put(A.addRebateSuccess(payload));
+      const res = {
+        investorId: path([0, 'investor', 'investorId'], payload),
+        rebates: payload,
+      };
+      yield call(api.addRebate, [res]);
+      yield call(fetchRebates, { payload: { size: 1000 } });
+      // const data = yield call(api.getRebates, {
+      //   investorId: res.investorId,
+      //   size: 50,
+      // });
+      yield put(A.addRebateSuccess(res));
       yield;
     } catch (e) {
       yield put(A.addRebateFailure(e));

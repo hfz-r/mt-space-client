@@ -9,12 +9,12 @@ export default ({ apiUrl, get, post }) => {
       data: payload,
     });
 
-  const addRebate = ({ investorId, rebates }) =>
+  const addRebate = payload =>
     post({
       url: apiUrl,
       endPoint: '/rebate/create',
       removeDefaultPostData: true,
-      data: JSON.stringify({ investorId, rebates }),
+      data: JSON.stringify(payload),
     });
 
   return { getRebates, addRebate };

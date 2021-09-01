@@ -32,19 +32,7 @@ export const addRebateFailure = data => ({
   payload: data,
 });
 
-export const updateTable = ({ parentId, childData }) => ({
-  type: T.UPDATE_TABLE,
-  payload: { parentId, childData },
-});
-export const removeTable = ({ parentId, rowIndex }) => ({
-  type: T.REMOVE_TABLE,
-  payload: { parentId, rowIndex },
-});
-export const refreshTable = ({ parentId }) => ({
-  type: T.REFRESH_TABLE,
-  payload: { parentId },
-});
-export const persistTable = data => ({
+export const persistTable = payload => ({
   type: T.PERSIST_TABLE,
-  payload: data,
+  payload,
 });
