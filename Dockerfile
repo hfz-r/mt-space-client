@@ -1,4 +1,4 @@
-FROM node:13.12.0-alpine as build
+FROM node:14-alpine as build
 
 WORKDIR /app
 
@@ -9,19 +9,20 @@ ENV REACT_APP_API_URL=$API_URL
 ENV PATH /app/node_modules/.bin:$PATH
 
 # copy package
-COPY package.json yarn.lock ./
+COPY Client/web-app/package.json .
+COPY Client/web-app/yarn.lock .
 
 # run
 RUN yarn
-# copy deps
-COPY . ./
+# copy others
+COPY Client/web-app .
 
 # build
 RUN yarn build
 
 FROM nginx:stable-alpine
 COPY --from=build /app/build /usr/share/nginx/html
-COPY nginx.conf /etc/nginx/conf.d/default.conf
+COPY Client/web-app/nginx.conf /etc/nginx/conf.d/default.conf
 
 EXPOSE 80
 
