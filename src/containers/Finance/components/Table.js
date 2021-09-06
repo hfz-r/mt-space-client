@@ -21,7 +21,9 @@ import {
   useTable,
   useSortBy,
 } from 'react-table';
+import { GoTriangleDown, GoTriangleUp } from 'react-icons/go';
 import { fuzzyTextFilterFn, DefaultColumnFilter } from '../components/Filters';
+import Pagination from './Pagination';
 
 const DataTable = ({ columns, data, renderSubComponent }) => {
   const { colorMode } = useColorMode();
@@ -81,4 +83,142 @@ const DataTable = ({ columns, data, renderSubComponent }) => {
     useExpanded,
     usePagination
   );
+
+  useEffect(() => {
+    toggleHideColumn('expander', !!groupBy.length);
+  }, [groupBy, toggleHideColumn]);
+
+  return (
+    <>
+      <Flex
+        pt={5}
+        h={'full'}
+        w={'full'}
+        direction={'column'}
+        align={'center'}
+        justify={'center'}
+        bg={useColorModeValue('gray.50', 'gray.800')}
+      >
+        <Table
+          size="sm"
+          // variant="striped"
+          // colorScheme="blue"
+          display="block"
+          pos="relative"
+          overflow="auto"
+          {...getTableProps()}
+        >
+          <Thead>
+            {headerGroups.map(headerGroup => (
+              <Tr
+                key={`headerrow-${headerGroup.key}`}
+                {...headerGroup.getHeaderGroupProps()}
+              >
+                {headerGroup.headers.map((column, headerIndex) => (
+                  <Th
+                    key={`headercol-${headerIndex}`}
+                    {...column.getHeaderProps([
+                      {
+                        className: column.className,
+                        style: column.style,
+                      },
+                    ])}
+                    isNumeric={column.isNumeric}
+                  >
+                    <Flex {...column.getSortByToggleProps()}>
+                      {column.render('Header')}
+                      <chakra.span pl={3}>
+                        {column.isSorted ? (
+                          column.isSortedDesc ? (
+                            <GoTriangleDown aria-label="sorted descending" />
+                          ) : (
+                            <GoTriangleUp aria-label="sorted ascending" />
+                          )
+                        ) : null}
+                      </chakra.span>
+                    </Flex>
+                    {/* menu */}
+                    {column.id !== 'expander' && (
+                      <>
+                        <Divider my={2} />
+                        {/* <MenuWrapper
+                        key={`menu-${headerIndex}`}
+                        column={column}
+                      /> */}
+                      </>
+                    )}
+                    {/* columns filter */}
+                    <Box mt={4}>
+                      {column.canFilter ? column.render('Filter') : null}
+                    </Box>
+                  </Th>
+                ))}
+              </Tr>
+            ))}
+          </Thead>
+          <Tbody {...getTableBodyProps()}>
+            {page.map((row, i) => {
+              prepareRow(row);
+              const rowProps = row.getRowProps();
+              return (
+                <React.Fragment key={`bodyrow-${rowProps.key}`}>
+                  <Tr
+                    bg={colorMode === 'dark' && row.isExpanded && 'gray.700'}
+                    {...rowProps}
+                  >
+                    {row.cells.map((cell, cellIndex) => {
+                      return (
+                        <Td
+                          key={`bodycol-${cellIndex}`}
+                          {...cell.getCellProps([
+                            {
+                              className: cell.column.className,
+                              style: cell.column.style,
+                            },
+                          ])}
+                          isNumeric={cell.column.isNumeric}
+                        >
+                          {cell.isGrouped ? (
+                            <>
+                              <chakra.span {...row.getToggleRowExpandedProps()}>
+                                {row.isExpanded ? '🔽 ' : '▶️ '}
+                              </chakra.span>
+                              {cell.render('Cell')} ({row.subRows.length})
+                            </>
+                          ) : cell.isAggregated ? (
+                            cell.render('Aggregated')
+                          ) : cell.isPlaceholder ? null : (
+                            cell.render('Cell')
+                          )}
+                        </Td>
+                      );
+                    })}
+                  </Tr>
+                  {/* sub-component */}
+                  {row.isExpanded &&
+                    renderSubComponent({ row, visibleColumns })}
+                </React.Fragment>
+              );
+            })}
+          </Tbody>
+        </Table>
+        {/* pagination */}
+        <Pagination
+          total={data.length}
+          gotoPage={gotoPage}
+          previousPage={previousPage}
+          nextPage={nextPage}
+          canPreviousPage={canPreviousPage}
+          canNextPage={canNextPage}
+          pageCount={pageCount}
+          pageIndex={pageIndex}
+          pageOptions={pageOptions}
+          pageSize={pageSize}
+          setPageSize={setPageSize}
+        />
+      </Flex>
+    </>
+  );
 };
+
+export default DataTable;

@@ -1,6 +1,11 @@
 /* eslint-disable import/no-anonymous-default-export */
 import { takeLatest } from 'redux-saga/effects';
-import { FETCH_REBATES, ADD_REBATE, PERSIST_TABLE } from './constants';
+import {
+  FETCH_REBATES,
+  GET_REBATE,
+  CREATE_REBATE,
+  SAVE_REBATE,
+} from './constants';
 import sagas from './sagas';
 
 export default ({ api }) => {
@@ -8,7 +13,8 @@ export default ({ api }) => {
 
   return function* investorSaga() {
     yield takeLatest(FETCH_REBATES, saga.fetchRebates);
-    yield takeLatest(ADD_REBATE, saga.addRebate);
-    yield takeLatest(PERSIST_TABLE, saga.persistTable);
+    yield takeLatest(GET_REBATE, saga.getRebate);
+    yield takeLatest(CREATE_REBATE, saga.createRebate);
+    yield takeLatest(SAVE_REBATE, saga.saveRebate);
   };
 };

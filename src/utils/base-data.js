@@ -53,3 +53,5 @@ export const data = [
     ],
   },
 ];
+
+export const DEFAULT_SIZE = 100;

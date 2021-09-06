@@ -8,6 +8,7 @@ const Finance = props => {
   const { type } = computedMatch.params;
   const {
     config: { parent, child },
+    fetchData,
   } = useFinanceContext(type, 'Finance');
 
   return (
@@ -23,7 +24,7 @@ const Finance = props => {
           child.map(c => {
             const Component = c.content;
             return (
-              <Template key={c.name} {...c}>
+              <Template key={c.name} fetchData={fetchData} {...c}>
                 {c.content && <Component {...rest} />}
               </Template>
             );

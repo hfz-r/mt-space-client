@@ -1,5 +1,6 @@
 import { groupBy, lift, map, pick, pipe, prop, sortBy, values } from 'ramda';
 import { createSelector } from 'reselect';
+import Remote from 'utils/remote';
 import { INITIAL_STATE } from './reducers';
 
 export const selectState = state => state.investor || INITIAL_STATE;
@@ -20,6 +21,23 @@ export const makeSelectRebates = createSelector(selectRebates, rebatesR => {
   );
   const transform = ({ rebates }) => {
     return { rebates: R(rebates) };
+  };
+  return lift(transform)(rebatesR);
+});
+
+export const makeSelectRebate_ = createSelector(
+  [selectRebate, (state, id) => id],
+  (rebateR, id) => rebateR[id] || Remote.NotAsked
+);
+
+export const makeSelectRebates_ = createSelector(selectRebates, rebatesR => {
+  const transform = ({ rebates }) => {
+    const rb = pipe(
+      groupBy(r => r.investor?.investorId),
+      map(r => pick(['investor', 'setupDate'], r[0])),
+      values
+    );
+    return { rebates: rb(rebates) };
   };
   return lift(transform)(rebatesR);
 });

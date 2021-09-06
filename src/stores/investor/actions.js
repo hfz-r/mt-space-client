@@ -16,23 +16,44 @@ export const fetchRebatesFailure = data => ({
   payload: data,
 });
 
-export const addRebate = ({ coas, investor, setupDate }) => ({
-  type: T.ADD_REBATE,
-  payload: { coas, investor, setupDate },
+// export const fetchRebate = ({ parent }) => ({
+//   type: T.FETCH_REBATE,
+//   payload: { parent },
+// });
+export const fetchRebateLoading = ({ parent }) => ({
+  type: T.FETCH_REBATE_LOADING,
+  payload: { parent },
 });
-export const addRebateLoading = () => ({
-  type: T.ADD_REBATE_LOADING,
+export const fetchRebateSuccess = ({ parent, child }) => ({
+  type: T.FETCH_REBATE_SUCCESS,
+  payload: { parent, child },
 });
-export const addRebateSuccess = data => ({
-  type: T.ADD_REBATE_SUCCESS,
-  payload: data,
-});
-export const addRebateFailure = data => ({
-  type: T.ADD_REBATE_FAILURE,
-  payload: data,
+export const fetchRebateFailure = ({ parent, error }) => ({
+  type: T.FETCH_REBATE_FAILURE,
+  payload: { parent, error },
 });
 
-export const persistTable = payload => ({
-  type: T.PERSIST_TABLE,
+export const getRebate = ({ parent }) => ({
+  type: T.GET_REBATE,
+  payload: { parent },
+});
+export const addRebate = ({ parent, newChild }) => ({
+  type: T.ADD_REBATE,
+  payload: { parent, newChild },
+});
+export const removeRebate = ({ parent }) => ({
+  type: T.REMOVE_REBATE,
+  payload: { parent },
+});
+export const updateRebate = ({ parent, rowId, columnId, value }) => ({
+  type: T.UPDATE_REBATE,
+  payload: { parent, rowId, columnId, value },
+});
+export const createRebate = ({ coas, investor, setupDate }) => ({
+  type: T.CREATE_REBATE,
+  payload: { coas, investor, setupDate },
+});
+export const saveRebate = payload => ({
+  type: T.SAVE_REBATE,
   payload,
 });

@@ -23,7 +23,7 @@ import {
 } from 'react-table';
 import { GoTriangleDown, GoTriangleUp } from 'react-icons/go';
 import { fuzzyTextFilterFn, DefaultColumnFilter } from '../components/Filters';
-import Pagination from './Pagination';
+import Pagination from '../components/Pagination';
 
 const DataTable = ({ columns, data, renderSubComponent }) => {
   const { colorMode } = useColorMode();

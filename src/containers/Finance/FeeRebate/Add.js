@@ -14,11 +14,9 @@ import {
   useColorModeValue,
   useDisclosure,
 } from '@chakra-ui/react';
-import { HiDocumentAdd } from 'react-icons/hi';
-import { IoClose } from 'react-icons/io5';
+import { IoBagHandle, IoBagAdd } from 'react-icons/io5';
 // import FocusLock from 'react-focus-lock';
 import { actions } from 'stores';
-import useDataContext from 'hooks/ChildData';
 import { FormBody } from './components';
 
 const defaultValues = {
@@ -36,7 +34,6 @@ const defaultValues = {
 
 const Add = props => {
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const { busy, error } = useDataContext();
   const dispatch = useDispatch();
 
   const {
@@ -69,7 +66,7 @@ const Add = props => {
     ({ coas, investor, setupDate }) => {
       return new Promise(resolve => {
         setTimeout(() => {
-          dispatch(actions.investor.addRebate({ coas, investor, setupDate }));
+          dispatch(actions.investor.createRebate({ coas, investor, setupDate }));
           handleClose();
           resolve();
         }, 2000);
@@ -82,7 +79,7 @@ const Add = props => {
     <>
       <IconButton
         {...props}
-        icon={isOpen ? <IoClose /> : <HiDocumentAdd />}
+        icon={isOpen ? <IoBagHandle /> : <IoBagAdd />}
         onClick={onOpen}
       />
 
