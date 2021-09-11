@@ -131,7 +131,7 @@ const Template = props => {
                   props.fetchData({ size: e.target.value });
                 }}
               >
-                <option value="all">All</option>
+                <option value="9999">All</option>
                 <option value="50">50</option>
                 <option value="100">100</option>
                 <option value="200">200</option>

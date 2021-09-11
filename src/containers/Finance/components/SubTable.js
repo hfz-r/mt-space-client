@@ -310,21 +310,24 @@ const Error = ({ column, error }) => (
   </Tr>
 );
 
+const getRandomArbitrary = (min, max) => (Math.random() * (max - min + 1)) << 0;
+
 const SubTable = ({ parentVisibleColumns, parentData }) => {
-  const id = parentData.values['investor.investorId'];
+  const { investorId, investorName } = parentData.values;
   const {
     data,
     getData: get,
     addData: add,
     updateData: update,
-  } = useChildContext(id);
+  } = useChildContext(investorId);
   const skipResetRef = useRef(false);
 
   const addData = useCallback(() => {
     skipResetRef.current = true;
     const newData = {
-      investor: parentData.original.investor,
-      id: 0,
+      id: getRandomArbitrary(10000, 100000),
+      investorId,
+      investorName,
       amc: 'AFC',
       coa: '',
       currency: 'MYR',
@@ -332,29 +335,29 @@ const SubTable = ({ parentVisibleColumns, parentData }) => {
       type: 'Rebate',
       setupDate: new Date(),
     };
-    add(id, newData);
-  }, [add, id, parentData]);
+    add(investorId, newData);
+  }, [add, investorId, investorName]);
 
   const removeData = useCallback(
     rowId => {
       skipResetRef.current = true;
-      update(id, rowId, 'type', 'deleted');
+      update(investorId, rowId, 'type', 'deleted');
     },
-    [update, id]
+    [update, investorId]
   );
 
   const updateData = useCallback(
     (rowId, columnId, value) => {
       skipResetRef.current = true;
-      update(id, rowId, columnId, value);
+      update(investorId, rowId, columnId, value);
     },
-    [update, id]
+    [update, investorId]
   );
 
   const refreshData = useCallback(() => {
     skipResetRef.current = true;
-    get(id);
-  }, [get, id]);
+    get(investorId);
+  }, [get, investorId]);
 
   useEffect(() => {
     skipResetRef.current = false;

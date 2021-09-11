@@ -1,62 +1,45 @@
 /* eslint-disable import/no-anonymous-default-export */
-import axios from 'axios';
 import {
   assoc,
   curry,
   difference,
-  groupBy,
+  find,
   filter,
   isEmpty,
   keys,
   map,
   pipe,
-  prop,
-  slice,
-  values,
+  propEq,
 } from 'ramda';
-import { call, put, select } from 'redux-saga/effects';
+import { all, call, fork, put, select } from 'redux-saga/effects';
 import { DEFAULT_SIZE } from 'utils/base-data';
+import { selectors } from 'stores';
 import * as A from './actions';
 import * as S from './selectors';
 
 export default ({ api }) => {
   const fetchRebates = function* ({ payload }) {
     try {
+      const child = function* () {
+        const rebate = yield select(S.makeSelectChild_);
+        yield all(map(res => call(fetchRebate, res), rebate));
+      };
       yield put(A.fetchRebatesLoading());
-      //const data = yield call(api.getRebates, action.payload);
-      const data = yield axios.get('/data.json').then(prop('data'));
-      const size =
-        payload.size === 'all' ? Number.MAX_SAFE_INTEGER : payload.size;
-      const res = slice(0, size, data.rebates);
-      yield call(fetchRebate, res);
-      yield put(A.fetchRebatesSuccess({ rebates: res }));
+      const data = yield call(api.getRebates, payload);
+      yield put(A.fetchRebatesSuccess(data));
+      yield fork(child);
     } catch (e) {
       yield put(A.fetchRebatesFailure(e));
     }
   };
 
   const fetchRebate = function* (payload) {
+    const { parent, child } = payload;
     try {
-      const R = pipe(
-        groupBy(r => r.investor?.investorId),
-        map(r => ({
-          parent: r[0].investor?.investorId,
-          child: r,
-        })),
-        values
-      );
-      const res = R(payload);
-      for (let i in res) {
-        const { parent, child } = res[i];
-        try {
-          yield put(A.fetchRebateLoading({ parent }));
-          yield put(A.fetchRebateSuccess({ parent, child }));
-        } catch (e) {
-          yield put(A.fetchRebateFailure({ parent, error: e }));
-        }
-      }
+      yield put(A.fetchRebateLoading({ parent }));
+      yield put(A.fetchRebateSuccess({ parent, child }));
     } catch (e) {
-      throw e;
+      yield put(A.fetchRebateFailure({ parent, error: e }));
     }
   };
 
@@ -64,16 +47,11 @@ export default ({ api }) => {
     const { parent } = payload;
     try {
       yield put(A.fetchRebateLoading({ parent }));
-      const { rebates } = yield axios.get('/data.json').then(prop('data'));
-      const rebate = filter(
-        ({ investor }) => investor.investorId === parent,
-        rebates
-      );
-      // const data = yield call(api.getRebates, {
-      //   investorId: payload.investorId,
-      //   size: DEFAULT_SIZE,
-      // });
-      yield put(A.fetchRebateSuccess({ parent, child: rebate }));
+      const { rebates } = yield call(api.getRebates, {
+        investorId: parent,
+        size: DEFAULT_SIZE,
+      });
+      yield put(A.fetchRebateSuccess({ parent, child: rebates }));
     } catch (e) {
       yield put(A.fetchRebateFailure({ parent, error: e }));
     }
@@ -82,18 +60,17 @@ export default ({ api }) => {
   const createRebate = function* ({ payload }) {
     try {
       const { coas, investor: name, setupDate } = payload;
-      const { investor } = (yield select(S.makeSelectInvestor)).getOrElse([]);
-      const i = investor.find(i => i.investorName === name);
+      const selector = yield select(selectors.master.selectInvestors);
+      const { investors } = selector.getOrElse({});
+      const i = find(propEq('investorName', name))(investors);
       const res = {
-        investorId: i.investorId,
         rebates: map(c => ({
-          ...assoc('investor', i, c),
+          investorId: i.investorId,
           ...assoc('setupDate', setupDate, c),
           ...c,
         }))(coas),
       };
-      //yield call(api.addRebate, [res]);
-      console.log([res]);
+      yield call(api.addRebate, [res]);
       if ([res].length > 0) {
         yield call(fetchRebates, { payload: { size: DEFAULT_SIZE } });
       }
@@ -102,23 +79,21 @@ export default ({ api }) => {
     }
   };
 
-  const saveRebate = function* (payload) {
+  const saveRebate = function* () {
     try {
-      const { rebates } = (yield select(S.selectRebates)).getOrElse({});
+      const { rebates: rb } = (yield select(S.selectRebates)).getOrElse({});
       const rebate = yield select(S.selectRebate);
       const diff = pipe(
-        map(r => difference(r.getOrElse([]), rebates)),
+        map(r => difference(r.getOrElse([]), rb)),
         filter(r => !isEmpty(r))
       );
       const ddiff = diff(rebate);
       const build = curry(k => ddiff[k]);
       const list = map(r => ({
-        investorId: r,
         rebates: build(r),
       }));
       const res = list(keys(ddiff));
-      // yield call(api.addRebate, res);
-      console.log(res);
+      yield call(api.addRebate, res);
       if (res.length > 0) {
         yield call(fetchRebates, { payload: { size: DEFAULT_SIZE } });
       }

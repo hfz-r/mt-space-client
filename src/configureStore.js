@@ -3,7 +3,7 @@ import { createBrowserHistory } from 'history';
 import { applyMiddleware, compose, createStore } from 'redux';
 import createSagaMiddleware from 'redux-saga';
 import createApi from './api';
-import { rootReducer, rootSaga } from './stores';
+import { actions, rootReducer, rootSaga } from './stores';
 import serializer from './utils/Serializer';
 
 const devToolsConfig = {
@@ -29,6 +29,9 @@ const configureStore = async function (preloadedState = {}) {
   sagaMiddleware.run(rootSaga, {
     api,
   });
+
+  // expose globals here
+  store.dispatch(actions.master.fetchInvestors({ size: 1000 }));
 
   return {
     history,

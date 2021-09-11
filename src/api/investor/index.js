@@ -9,6 +9,15 @@ export default ({ apiUrl, get, post }) => {
       data: payload,
     });
 
+  const getInvestors = payload =>
+    get({
+      url: apiUrl,
+      endPoint: '/investors',
+      contentType: 'application/json',
+      removeDefaultPostData: true,
+      data: payload,
+    });
+
   const addRebate = payload =>
     post({
       url: apiUrl,
@@ -17,5 +26,5 @@ export default ({ apiUrl, get, post }) => {
       data: JSON.stringify(payload),
     });
 
-  return { getRebates, addRebate };
+  return { getRebates, getInvestors, addRebate };
 };

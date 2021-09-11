@@ -9,7 +9,7 @@ import {
   Stack,
   useColorModeValue,
 } from '@chakra-ui/react';
-import { InvestorField } from './field-investor';
+import InvestorField from './field-investor';
 
 export const FormGeneral = ({ control, errors, register, setValue, watch }) => {
   // const handleChange = useCallback(

@@ -29,7 +29,7 @@ const FeeRebate = props => {
       },
       {
         Header: 'Investor ID',
-        accessor: 'investor.investorId',
+        accessor: 'investorId',
         aggregate: 'count',
         Aggregated: ({ value }) => `${value} investor ids`,
         style: {
@@ -39,7 +39,7 @@ const FeeRebate = props => {
       },
       {
         Header: 'Investor Name',
-        accessor: 'investor.investorName',
+        accessor: 'investorName',
         aggregate: 'count',
         Aggregated: ({ value }) => `${value} investor names`,
         filter: 'fuzzyText',

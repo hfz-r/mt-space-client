@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { memo, useMemo } from 'react';
 import { useSelector } from 'react-redux';
 import { useController } from 'react-hook-form';
 import {
@@ -17,12 +17,13 @@ import { IoClose, IoSearch } from 'react-icons/io5';
 import { selectors } from 'stores';
 
 const useInvestorContext = () => {
-  const investor = useSelector(selectors.investor.makeSelectInvestor);
-  return investor.getOrElse([]);
+  const memoizeData = useMemo(() => selectors.master.selectInvestors, []);
+  const investor = useSelector(state => memoizeData(state));
+  return investor.getOrElse({});
 };
 
-export const InvestorField = ({ control, ...rest }) => {
-  const { investor } = useInvestorContext();
+const InvestorField = ({ control, ...rest }) => {
+  const { investors } = useInvestorContext();
   const {
     field: { ref, onChange, value },
   } = useController({
@@ -74,7 +75,7 @@ export const InvestorField = ({ control, ...rest }) => {
         </InputRightElement>
       </InputGroup>
       <AutoCompleteList>
-        {investor?.map(inv => (
+        {investors?.map(inv => (
           <AutoCompleteItem
             key={`option-${inv.investorId}`}
             value={inv.investorName}
@@ -91,3 +92,5 @@ export const InvestorField = ({ control, ...rest }) => {
     </AutoComplete>
   );
 };
+
+export default memo(InvestorField);
