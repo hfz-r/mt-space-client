@@ -1,4 +1,5 @@
 /* eslint-disable import/no-anonymous-default-export */
+import axios from 'axios';
 import {
   assoc,
   curry,
@@ -10,6 +11,8 @@ import {
   map,
   pipe,
   propEq,
+  prop,
+  slice,
 } from 'ramda';
 import { all, call, fork, put, select } from 'redux-saga/effects';
 import { DEFAULT_SIZE } from 'utils/base-data';
@@ -25,7 +28,8 @@ export default ({ api }) => {
         yield all(map(res => call(fetchRebate, res), rebate));
       };
       yield put(A.fetchRebatesLoading());
-      const data = yield call(api.getRebates, payload);
+      // const data = yield call(api.getRebates, payload);
+      const data = yield axios.get('/rebates.json').then(prop('data'));
       yield put(A.fetchRebatesSuccess(data));
       yield fork(child);
     } catch (e) {
